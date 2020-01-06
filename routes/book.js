@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Book = require('../models/book');
+const Author = require('../models/author');
 
 
 // GET book form create
@@ -66,7 +67,9 @@ router.get('/:bookId', (req, res, next) => {
   } = req.params;
 
   Book.findById(bookId)
+    .populate('author')
     .then(book => {
+      console.log(book);
       res.render('details-books', {
         book
       });

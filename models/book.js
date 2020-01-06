@@ -5,8 +5,11 @@ const Schema = mongoose.Schema;
 
 const bookSchema = new Schema({
   title: String,
+  author: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Author'
+  }],
   description: String,
-  author: String,
   rating: Number
 }, {
   timestamps: true
