@@ -1,11 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const Book = require('../models/book');
+const Author = require('../models/author');
 
 
 // GET book form create
 router.get('/add-book', (req, res) => {
-  res.render('add-book');
+  Author.find()
+    .sort({
+      name: 1
+    })
+    .then(authors => res.render('add-book', {
+      authors
+    }))
+    .catch(error => console.log(error))
 });
 
 // POST book create
@@ -66,12 +74,41 @@ router.get('/:bookId', (req, res, next) => {
   } = req.params;
 
   Book.findById(bookId)
+    .populate('author')
     .then(book => {
+      console.log(book);
       res.render('details-books', {
         book
       });
     })
     .catch(error => next(error))
+});
+
+// REVIEWS
+
+// create review post
+
+router.post('/reviews/add', (req, res, next) => {
+  const {
+    user,
+    comments
+  } = req.body;
+  Book.update({
+      _id: req.query.book_id
+    }, {
+      $push: {
+        reviews: {
+          user,
+          comments
+        }
+      }
+    })
+    .then(book => {
+      res.redirect('/books/' + req.query.book_id)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
 });
 
 
