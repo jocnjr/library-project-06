@@ -10,7 +10,11 @@ const bookSchema = new Schema({
     ref: 'Author'
   }],
   description: String,
-  rating: Number
+  rating: Number,
+  reviews: [{
+    user: String,
+    comments: String
+  }]
 }, {
   timestamps: true
 });
