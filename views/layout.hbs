@@ -11,8 +11,14 @@
 
 <body>
   <ul>
+    {{#if currentUser}}
     <li><a href="/books">books</a></li>
     <li><a href="/books/add-book">add book</a></li>
+    <li><a href="/logout">logout</a></li>
+    {{else}}
+    <li><a href="/login">login</a></li>
+    <li><a href="/signup">sign up</a></li>
+    {{/if}}
   </ul>
 
   {{{body}}}
