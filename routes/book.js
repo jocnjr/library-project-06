@@ -2,10 +2,11 @@ const express = require('express');
 const router = express.Router();
 const Book = require('../models/book');
 const Author = require('../models/author');
+const ensureLogin = require("connect-ensure-login");
 
 
 // GET book form create
-router.get('/add-book', (req, res) => {
+router.get('/add-book', ensureLogin.ensureLoggedIn(), (req, res) => {
   Author.find()
     .sort({
       name: 1
@@ -17,24 +18,27 @@ router.get('/add-book', (req, res) => {
 });
 
 // POST book create
-router.post('/add-book', (req, res, next) => {
-  Book.create(req.body)
+router.post('/add-book', ensureLogin.ensureLoggedIn(), (req, res, next) => {
+  Book.create({
+      owner: req.user._id,
+      ...req.body
+    })
     .then(_ => res.redirect('/books'))
     .catch(error => next(error))
 });
 
 // GET book edit form
-router.get('/edit-book/:bookId', (req, res) => {
-  let {
-    bookId
-  } = req.params;
+// router.get('/edit-book/:bookId', (req, res) => {
+//   let {
+//     bookId
+//   } = req.params;
 
-  Book.findById(bookId)
-    .then(book => {
-      res.render('edit-book', book);
-    })
-    .catch(error => next(error))
-});
+//   Book.findById(bookId)
+//     .then(book => {
+//       res.render('edit-book', book);
+//     })
+//     .catch(error => next(error))
+// });
 
 // POST book edit
 router.post('/edit-book', (req, res, next) => {
@@ -103,24 +107,57 @@ router.post('/reviews/add', (req, res, next) => {
 
 // protected routes below vvvv
 
-router.use((req, res, next) => {
-  if (req.session.currentUser) {
-    next();
-  } else {
-    res.redirect("/login");
-  }
-});
+// router.use((req, res, next) => {
+//   if (req.session.currentUser) {
+//     next();
+//   } else {
+//     res.redirect("/login");
+//   }
+// });
 
-// GET books home page
-router.get('/', (req, res, next) => {
-  Book.find()
+// GET books home page - ensure login protect the /books route
+router.get('/', ensureLogin.ensureLoggedIn(), (req, res, next) => {
+  console.log(req.user);
+  Book.find({
+      owner: req.user._id
+    })
     .then(books => {
       res.render('index-books', {
-        books,
-        currentUser: req.session.currentUser
+        books
       });
     })
     .catch(error => console.log(error))
 });
+
+const checkGuest = checkRoles('GUEST');
+const checkEditor = checkRoles('EDITOR');
+const checkAdmin = checkRoles('ADMIN');
+
+// GET book edit form
+router.get('/edit-book/:bookId', checkAdmin, (req, res) => {
+  console.log(req.user)
+  let {
+    bookId
+  } = req.params;
+
+  Book.findById(bookId)
+    .then(book => {
+      res.render('edit-book', book);
+    })
+    .catch(error => next(error))
+});
+
+function checkRoles(role) {
+  console.log('inside checkRoles', role)
+  return function (req, res, next) {
+    console.log('inside clousure')
+    if (req.isAuthenticated() && req.user.role === role) {
+      console.log('inside clousure and role')
+      return next();
+    } else {
+      res.redirect('/login')
+    }
+  }
+}
 
 module.exports = router;

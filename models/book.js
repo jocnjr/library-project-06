@@ -14,7 +14,11 @@ const bookSchema = new Schema({
   reviews: [{
     user: String,
     comments: String
-  }]
+  }],
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  }
 }, {
   timestamps: true
 });
