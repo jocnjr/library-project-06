@@ -48,16 +48,6 @@ router.post('/edit-book', (req, res, next) => {
     .catch(error => next(error))
 });
 
-// GET books home page
-router.get('/', (req, res, next) => {
-  Book.find()
-    .then(books => {
-      res.render('index-books', {
-        books
-      });
-    })
-    .catch(error => console.log(error))
-});
 
 // GET DELETE book
 router.get('/delete-book', (req, res, next) => {
@@ -111,5 +101,26 @@ router.post('/reviews/add', (req, res, next) => {
     })
 });
 
+// protected routes below vvvv
+
+router.use((req, res, next) => {
+  if (req.session.currentUser) {
+    next();
+  } else {
+    res.redirect("/login");
+  }
+});
+
+// GET books home page
+router.get('/', (req, res, next) => {
+  Book.find()
+    .then(books => {
+      res.render('index-books', {
+        books,
+        currentUser: req.session.currentUser
+      });
+    })
+    .catch(error => console.log(error))
+});
 
 module.exports = router;
