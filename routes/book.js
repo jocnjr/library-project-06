@@ -148,11 +148,8 @@ router.get('/edit-book/:bookId', checkAdmin, (req, res) => {
 });
 
 function checkRoles(role) {
-  console.log('inside checkRoles', role)
   return function (req, res, next) {
-    console.log('inside clousure')
     if (req.isAuthenticated() && req.user.role === role) {
-      console.log('inside clousure and role')
       return next();
     } else {
       res.redirect('/login')

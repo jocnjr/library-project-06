@@ -14,10 +14,10 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const SlackStrategy = require("passport-slack").Strategy;
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-// adding user model for passport local strategy
-const User = require('./models/user');
 const bcrypt = require("bcrypt");
 const flash = require("connect-flash");
+// adding user model for passport local strategy
+const User = require('./models/user');
 
 mongoose
   .connect(process.env.MONGODB_URI, {
