@@ -201,7 +201,12 @@ const book = require('./routes/book');
 app.use('/books', book);
 
 // auth routes
-const router = require('./routes/auth');
-app.use('/', router);
+const authRoutes = require('./routes/auth');
+app.use('/', authRoutes);
+
+// Books API
+
+const apiRoutes = require('./routes/api');
+app.use('/api', apiRoutes);
 
 module.exports = app;

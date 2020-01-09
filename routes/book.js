@@ -19,9 +19,28 @@ router.get('/add-book', ensureLogin.ensureLoggedIn(), (req, res) => {
 
 // POST book create
 router.post('/add-book', ensureLogin.ensureLoggedIn(), (req, res, next) => {
+  console.log(req.body)
+  const {
+    title,
+    description,
+    rating,
+    author,
+    latitude,
+    longitude
+  } = req.body;
+
+  let location = {
+    type: 'Point',
+    coordinates: [longitude, latitude]
+  };
+
   Book.create({
       owner: req.user._id,
-      ...req.body
+      title,
+      description,
+      rating,
+      author,
+      location
     })
     .then(_ => res.redirect('/books'))
     .catch(error => next(error))
@@ -44,10 +63,26 @@ router.post('/add-book', ensureLogin.ensureLoggedIn(), (req, res, next) => {
 router.post('/edit-book', (req, res, next) => {
   const {
     _id,
-    ...book
+    title,
+    description,
+    rating,
+    author,
+    latitude,
+    longitude
   } = req.body;
 
-  Book.findByIdAndUpdate(_id, book)
+  let location = {
+    type: 'Point',
+    coordinates: [longitude, latitude]
+  };
+
+  Book.findByIdAndUpdate(_id, {
+      title,
+      description,
+      rating,
+      author,
+      location
+    })
     .then(_ => res.redirect('/books'))
     .catch(error => next(error))
 });
@@ -134,7 +169,7 @@ const checkEditor = checkRoles('EDITOR');
 const checkAdmin = checkRoles('ADMIN');
 
 // GET book edit form
-router.get('/edit-book/:bookId', checkAdmin, (req, res) => {
+router.get('/edit-book/:bookId', (req, res) => {
   console.log(req.user)
   let {
     bookId
