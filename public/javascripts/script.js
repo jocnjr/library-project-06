@@ -41,7 +41,7 @@ if (mapDiv) {
 
 }
 
-const geocodeAddress = (geocoder) => {
+const geocodeAddress = () => {
   let address = document.getElementById('address').value;
 
   geocoder.geocode({
@@ -62,7 +62,7 @@ const geocodeAddress = (geocoder) => {
 
 if (addressInput) {
   addressInput.addEventListener('focusout', () => {
-    geocodeAddress(geocoder);
+    geocodeAddress();
   });
 
 }
