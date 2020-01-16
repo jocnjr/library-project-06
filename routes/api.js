@@ -14,5 +14,22 @@ router.get('/books/:bookId', (req, res, next) => {
     .catch(error => console.log(error))
 });
 
+// geo query location using near
+router.post('/books/near', (req, res, next) => {
+  const {
+    loc
+  } = req.body.address;
+
+  Book.find().where('location').near({
+      center: {
+        type: 'Point',
+        coordinates: [loc[1], loc[0]]
+      },
+      maxDistance: 5000
+    })
+    .then(response => res.json(response))
+    .catch(error => console.log(error))
+});
+
 
 module.exports = router;
